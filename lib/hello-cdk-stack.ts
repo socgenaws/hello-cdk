@@ -77,5 +77,4 @@ export class HelloCdkStack extends cdk.Stack {
     // 👇 add the User Data script to the Instance
     ec2Instance.addUserData(userDataScript);
   }
-  }
 }
