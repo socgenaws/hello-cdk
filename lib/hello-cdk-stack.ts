@@ -75,10 +75,10 @@ export class HelloCdkStack extends cdk.Stack {
     //   keyName: 'virginia',
     // });
 
-    // 👇 load contents of script
-    const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
-    // 👇 add the User Data script to the Instance
-    ec2Instance.addUserData(userDataScript);
+    // // 👇 load contents of script
+    // const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
+    // // 👇 add the User Data script to the Instance
+    // ec2Instance.addUserData(userDataScript);
 
     const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
       vpc,
