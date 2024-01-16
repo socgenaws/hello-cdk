@@ -12,9 +12,9 @@ export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    new s3.Bucket(this, 'MyFirstBucketdchgdcghfcd1r610120241240', {
-      versioned: true
-    });
+    // new s3.Bucket(this, 'MyFirstBucketdchgdcghfcd1r610120241240', {
+    //   versioned: true
+    // });
 
     // 👇 create VPC in which we'll launch the Instance
     const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
