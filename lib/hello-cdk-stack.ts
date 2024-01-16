@@ -83,7 +83,9 @@ export class HelloCdkStack extends cdk.Stack {
     const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
       vpc,
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE4_GRAVITON, ec2.InstanceSize.MICRO),
-      machineImage: "ami-06a8a766f09436b30"
+      machineImage: ec2.MachineImage.genericLinux({
+        'us-east-1': 'ami-06a8a766f09436b30',
+      })
     });
 
     const lb = new elb.LoadBalancer(this, 'LB', {
