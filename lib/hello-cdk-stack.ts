@@ -85,7 +85,9 @@ export class HelloCdkStack extends cdk.Stack {
       instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
       machineImage: ec2.MachineImage.genericLinux({
         'us-east-1': 'ami-06a8a766f09436b30',
-      })
+      }),
+      keyName: 'virginia',
+      minCapacity: 2
     });
 
     const lb = new elb.LoadBalancer(this, 'LB', {
