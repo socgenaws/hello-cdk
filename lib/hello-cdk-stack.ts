@@ -2,6 +2,9 @@ import * as cdk from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_elasticloadbalancing as elb } from 'aws-cdk-lib';
+import { aws_autoscaling as autoscaling } from 'aws-cdk-lib';
+
 import {readFileSync} from 'fs';
 
 
@@ -76,5 +79,24 @@ export class HelloCdkStack extends cdk.Stack {
     const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
     // 👇 add the User Data script to the Instance
     ec2Instance.addUserData(userDataScript);
+
+    const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
+      vpc,
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE4_GRAVITON, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.latestAmazonLinux2023({
+        cpuType: ec2.AmazonLinuxCpuType.ARM_64
+      })
+    });
+
+    const lb = new elb.LoadBalancer(this, 'LB', {
+      vpc,
+      internetFacing: true,
+      healthCheck: {
+        port: 80
+      },
+    });
+    lb.addTarget(asg);
+    const listener = lb.addListener({ externalPort: 80 });
+    listener.connections.allowDefaultPortFromAnyIpv4('Open to the world');
   }
 }
