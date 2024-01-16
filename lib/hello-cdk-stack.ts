@@ -2,7 +2,6 @@ import * as cdk from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
-import { aws_iam as iam } from 'aws-cdk-lib';
 import {readFileSync} from 'fs';
 
 
