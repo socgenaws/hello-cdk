@@ -58,22 +58,22 @@ export class HelloCdkStack extends cdk.Stack {
     });
 
     // 👇 create the EC2 Instance
-    const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
-      vpc,
-      vpcSubnets: {
-        subnetType: ec2.SubnetType.PUBLIC,
-      },
-      role: webserverRole,
-      securityGroup: webserverSG,
-      instanceType: ec2.InstanceType.of(
-        ec2.InstanceClass.BURSTABLE2,
-        ec2.InstanceSize.MICRO,
-      ),
-      machineImage: new ec2.AmazonLinuxImage({
-        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
-      }),
-      keyName: 'virginia',
-    });
+    // const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
+    //   vpc,
+    //   vpcSubnets: {
+    //     subnetType: ec2.SubnetType.PUBLIC,
+    //   },
+    //   role: webserverRole,
+    //   securityGroup: webserverSG,
+    //   instanceType: ec2.InstanceType.of(
+    //     ec2.InstanceClass.BURSTABLE2,
+    //     ec2.InstanceSize.MICRO,
+    //   ),
+    //   machineImage: new ec2.AmazonLinuxImage({
+    //     generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+    //   }),
+    //   keyName: 'virginia',
+    // });
 
     // 👇 load contents of script
     const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
