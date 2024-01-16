@@ -1,6 +1,9 @@
 import * as cdk from 'aws-cdk-lib';
 import { aws_s3 as s3 } from 'aws-cdk-lib';
 import { aws_ec2 as ec2 } from 'aws-cdk-lib';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import { aws_iam as iam } from 'aws-cdk-lib';
+import {readFileSync} from 'fs';
 
 
 export class HelloCdkStack extends cdk.Stack {
@@ -43,6 +46,37 @@ export class HelloCdkStack extends cdk.Stack {
       ec2.Port.tcp(443),
       'allow HTTPS traffic from anywhere',
     );
-    
+
+    // 👇 create a Role for the EC2 Instance
+    const webserverRole = new iam.Role(this, 'webserver-role', {
+      assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
+      managedPolicies: [
+        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3ReadOnlyAccess'),
+      ],
+    });
+
+    // 👇 create the EC2 Instance
+    const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
+      vpc,
+      vpcSubnets: {
+        subnetType: ec2.SubnetType.PUBLIC,
+      },
+      role: webserverRole,
+      securityGroup: webserverSG,
+      instanceType: ec2.InstanceType.of(
+        ec2.InstanceClass.BURSTABLE2,
+        ec2.InstanceSize.MICRO,
+      ),
+      machineImage: new ec2.AmazonLinuxImage({
+        generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
+      }),
+      keyName: 'virginia',
+    });
+
+    // 👇 load contents of script
+    const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
+    // 👇 add the User Data script to the Instance
+    ec2Instance.addUserData(userDataScript);
+  }
   }
 }
