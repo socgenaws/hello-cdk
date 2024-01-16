@@ -1,0 +1,76 @@
+  150  cd
+  151  curl -o- https://raw.githubusercontent.com/creationix/nvm/v0.32.0/install.sh | bash
+  152  . ~/.nvm/nvm.sh
+  153  nvm install 15.0.0
+  154  node -e "console.log('Running Node.js ' + process.version)"
+  155  clear
+  156  npm -g install typescript
+  157  npm install -g npm@10.3.0
+  158  nvm install 20.5.0
+  159  npm install -g npm@10.3.0
+  160  npm -g install typescript
+  161  pwd
+  162  ls -rlta
+  163  aws s3 ls 
+  164  npm install -g aws-cdk
+  165  which cdk
+  166  cdk --help
+  167  cdk --version
+  168  cdk bootstrap aws://675467602881/us-east-1
+  169  aws s3 ls
+  170  cd
+  171  cd devops/
+  172  ls -lrt
+  173  sh delete.sh 
+  174  cd
+  175  ls -lrt
+  176  cd devops/
+  177  ls -lrt
+  178  cd
+  179  cd devops/
+  180  ls -lrt
+  181  mkdir hello-cdk
+  182  cd hello-cdk
+  183  pwd
+  184  l -lrt
+  185  clear
+  186  cdk init app --language typescript
+  187  ls -lrta
+  188  cat cdk.json 
+  189  ls -lert
+  190  ls -lrt
+  191  cat README.md 
+  192  ls -lrta
+  193  git status
+  194  ls -lrt
+  195  cd lib/
+  196  ls -lrt
+  197  cat hello-cdk-stack.ts 
+  198  cd ..
+  199  npm run build
+  200  export NODE_OPTIONS=--max_old_space_size=4096
+  201  npm run build
+  202  cd lib/
+  203  ls -lrt
+  204  vi hello-cdk-stack.ts 
+  205  cd ..
+  206  ls -lrt
+  207  cd bin/
+  208  ls 0-lrt
+  209  ls -lrt
+  210  cat hello-cdk.ts 
+  211  cd ..
+  212  ls -lrt
+  213  cd lib/
+  214  vi hello-cdk-stack.ts 
+  215  cdk synth
+  216  cd ..
+  217  cdk synth
+  218  cdk --help
+  219  cdk ls
+  220  cdk deploy
+  221  cdk
+  222  pwd
+  223  cdk destroy 
+  224  cdk bootstrap --help
+  225  history
