@@ -65,9 +65,7 @@ export class HelloCdkStack extends cdk.Stack {
     const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
       vpc,
       vpcSubnets: {
-        subnetType: {
-          availabilityZones: ['us-east-1a']
-        }
+        subnetType: ec2.SubnetType.PUBLIC
       },
       //role: webserverRole,
       securityGroup: webserverSG,
@@ -88,7 +86,7 @@ export class HelloCdkStack extends cdk.Stack {
 
      // 👇 create the EBS Volume 
      const volume = new ec2.Volume(this, 'Volume', {
-      availabilityZone: 'us-east-1',
+      availabilityZone: 'us-east-1a',
       size: size.gibibytes(1),
       encrypted: true,
     });
