@@ -93,7 +93,7 @@ export class HelloCdkStack extends cdk.Stack {
 
     volume.grantAttachVolume(webserverRole, [ec2Instance]);
 
-    ec2Instance.instance.userData.addCommands(
+    ec2Instance.userData.addCommands(
       'mkfs -t ext4 /dev/xvdf', // Format the volume
       'mkdir /data', // Create a mount point
       'mount /dev/xvdf /data', // Mount the volume
