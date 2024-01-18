@@ -90,15 +90,6 @@ export class HelloCdkStack extends cdk.Stack {
 
     volume.grantAttachVolume(webserverRole, [ec2Instance]);
 
-    //const cfnVolumeAttachment = 
-    new ec2.CfnVolumeAttachment(this, 'MyCfnVolumeAttachment', {
-      instanceId: ec2Instance,
-      volumeId: volume,
-    
-      // the properties below are optional
-      device: '/dev/xvdf',
-    });
-
     // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
     //   vpc,
     //   instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
