@@ -64,7 +64,7 @@ export class HelloCdkStack extends cdk.Stack {
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC,
       },
-      role: webserverRole,
+      //role: webserverRole,
       securityGroup: webserverSG,
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.BURSTABLE2,
@@ -88,7 +88,7 @@ export class HelloCdkStack extends cdk.Stack {
       encrypted: true,
     });
 
-    volume.grantAttachVolume([ec2Instance]);
+    volume.grantAttachVolume(webserverRole, [ec2Instance]);
 
     // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
     //   vpc,
