@@ -88,7 +88,7 @@ export class HelloCdkStack extends cdk.Stack {
       encrypted: true,
     });
 
-    volume.grantAttachVolume(webserverRole, [ec2Instance]);
+    volume.grantAttachVolume([ec2Instance]);
 
     // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
     //   vpc,
