@@ -84,7 +84,7 @@ export class HelloCdkStack extends cdk.Stack {
      // 👇 create the EBS Volume 
      const volume = new ec2.Volume(this, 'Volume', {
       availabilityZone: 'us-east-1b',
-      size: Size.gibibytes(1),
+      size: 1,
       encrypted: true,
     });
 
