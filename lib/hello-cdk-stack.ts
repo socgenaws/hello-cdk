@@ -17,13 +17,15 @@ export class HelloCdkStack extends cdk.Stack {
     // });
 
     // 👇 create VPC in which we'll launch the Instance
-    const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
-      cidr: '10.0.0.0/16',
-      natGateways: 0,
-      subnetConfiguration: [
-        {name: 'public', cidrMask: 24, subnetType: ec2.SubnetType.PUBLIC},
-      ],
-    });
+    const vpc = 'vpc-0a7e507ae6849cf80'
+    const subnet = 'subnet-09377a43c76e65fdb'
+    // const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
+    //   cidr: '10.0.0.0/16',
+    //   natGateways: 0,
+    //   subnetConfiguration: [
+    //     {name: 'public', cidrMask: 24, subnetType: ec2.SubnetType.PUBLIC},
+    //   ],
+    // });
 
     // 👇 create Security Group for the Instance
     const webserverSG = new ec2.SecurityGroup(this, 'webserver-sg', {
@@ -62,7 +64,7 @@ export class HelloCdkStack extends cdk.Stack {
     const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
       vpc,
       vpcSubnets: {
-        subnetType: ec2.SubnetType.PUBLIC,
+        subnetType: subnet
       },
       //role: webserverRole,
       securityGroup: webserverSG,
@@ -77,18 +79,26 @@ export class HelloCdkStack extends cdk.Stack {
     });
 
     // 👇 load contents of script
-    const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
+    //const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
     // 👇 add the User Data script to the Instance
-    ec2Instance.addUserData(userDataScript);
+   // ec2Instance.addUserData(userDataScript);
 
      // 👇 create the EBS Volume 
      const volume = new ec2.Volume(this, 'Volume', {
-      availabilityZone: 'us-east-1a',
+      availabilityZone: 'us-east-1',
       size: size.gibibytes(1),
       encrypted: true,
     });
 
+
     volume.grantAttachVolume(webserverRole, [ec2Instance]);
+
+    ec2Instance.instance.userData.addCommands(
+      'mkfs -t ext4 /dev/xvdf', // Format the volume
+      'mkdir /data', // Create a mount point
+      'mount /dev/xvdf /data', // Mount the volume
+      'echo "/dev/xvdf /data ext4 defaults 0 0" >> /etc/fstab' // Make the mount permanent
+    );
 
     // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
     //   vpc,
