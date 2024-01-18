@@ -1,0 +1,43 @@
+import * as cdk from 'aws-cdk-lib';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+
+class MyStack extends cdk.Stack {
+  constructor(scope: cdk.Construct, id: string, props?: cdk.StackProps) {
+    super(scope, id, props);
+
+    // Create a VPC
+    const vpc = new ec2.Vpc(this, 'MyVpc', {
+      maxAzs: 2, // Use 2 availability zones for high availability
+    });
+
+    // Create an EC2 instance
+    const instance = new ec2.Instance(this, 'MyInstance', {
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.T2, ec2.InstanceSize.MICRO),
+      machineImage: ec2.MachineImage.latestAmazonLinux(),
+      vpc: vpc,
+    });
+
+    // Create an EBS volume
+    const ebsVolume = new ec2.Volume(this, 'MyEBSVolume', {
+      availabilityZone: instance.instanceAvailabilityZone,
+      size: 100, // Size in GiB
+    });
+
+    // Attach the EBS volume to the EC2 instance
+    instance.instance.addBlockDeviceMappings({
+      deviceName: '/dev/sdf', // Change this to the desired device name
+      volume: ec2.BlockDeviceVolume.ebs(ebsVolume, { deleteOnTermination: true }),
+    });
+
+    // User data script to format and mount the EBS volume
+    instance.instance.userData.addCommands(
+      'mkfs -t ext4 /dev/xvdf', // Format the volume
+      'mkdir /data', // Create a mount point
+      'mount /dev/xvdf /data', // Mount the volume
+      'echo "/dev/xvdf /data ext4 defaults 0 0" >> /etc/fstab' // Make the mount permanent
+    );
+  }
+}
+
+const app = new cdk.App();
+new MyStack(app, 'MyStack');
