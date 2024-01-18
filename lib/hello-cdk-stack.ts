@@ -17,8 +17,9 @@ export class HelloCdkStack extends cdk.Stack {
     // });
 
     // 👇 create VPC in which we'll launch the Instance
-    const vpc = 'vpc-0a7e507ae6849cf80'
-    const subnet = 'subnet-09377a43c76e65fdb'
+    const vpc = ec2.Vpc.fromLookup(this, "VPC", {
+      isDefault: true,
+    });
     // const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
     //   cidr: '10.0.0.0/16',
     //   natGateways: 0,
@@ -64,7 +65,9 @@ export class HelloCdkStack extends cdk.Stack {
     const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
       vpc,
       vpcSubnets: {
-        subnetType: subnet
+        subnetType: {
+          availabilityZones: ['us-east-1a']
+        }
       },
       //role: webserverRole,
       securityGroup: webserverSG,
