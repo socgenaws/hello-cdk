@@ -96,12 +96,12 @@ export class HelloCdkStack extends cdk.Stack {
 
     volume.grantAttachVolume(webserverRole, [ec2Instance]);
 
-    ec2Instance.userData.addCommands(
-      'mkfs -t ext4 /dev/xvdf', // Format the volume
-      'mkdir /data', // Create a mount point
-      'mount /dev/xvdf /data', // Mount the volume
-      'echo "/dev/xvdf /data ext4 defaults 0 0" >> /etc/fstab' // Make the mount permanent
-    );
+    // ec2Instance.userData.addCommands(
+    //   'mkfs -t ext4 /dev/xvdf', // Format the volume
+    //   'mkdir /data', // Create a mount point
+    //   'mount /dev/xvdf /data', // Mount the volume
+    //   'echo "/dev/xvdf /data ext4 defaults 0 0" >> /etc/fstab' // Make the mount permanent
+    // );
 
     // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
     //   vpc,
