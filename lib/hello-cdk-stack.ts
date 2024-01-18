@@ -4,7 +4,7 @@ import { aws_ec2 as ec2 } from 'aws-cdk-lib';
 import { aws_iam as iam } from 'aws-cdk-lib';
 import { aws_elasticloadbalancing as elb } from 'aws-cdk-lib';
 import { aws_autoscaling as autoscaling } from 'aws-cdk-lib';
-
+import { Size as size } from 'aws-cdk-lib';
 import {readFileSync} from 'fs';
 
 
@@ -84,7 +84,7 @@ export class HelloCdkStack extends cdk.Stack {
      // 👇 create the EBS Volume 
      const volume = new ec2.Volume(this, 'Volume', {
       availabilityZone: 'us-east-1b',
-      size: 1,
+      size: size.gibibytes(1),
       encrypted: true,
     });
 
