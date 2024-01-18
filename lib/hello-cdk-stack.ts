@@ -81,14 +81,14 @@ export class HelloCdkStack extends cdk.Stack {
     // 👇 add the User Data script to the Instance
     ec2Instance.addUserData(userDataScript);
 
-    //  // 👇 create the EBS Volume 
-    //  const volume = new ec2.Volume(this, 'Volume', {
-    //   availabilityZone: 'us-east-1a',
-    //   size: size.gibibytes(1),
-    //   encrypted: true,
-    // });
+     // 👇 create the EBS Volume 
+     const volume = new ec2.Volume(this, 'Volume', {
+      availabilityZone: 'us-east-1b',
+      size: size.gibibytes(1),
+      encrypted: true,
+    });
 
-    // volume.grantAttachVolume(webserverRole, [ec2Instance]);
+    volume.grantAttachVolume(webserverRole, [ec2Instance]);
 
     // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
     //   vpc,
