@@ -17,16 +17,13 @@ export class HelloCdkStack extends cdk.Stack {
     // });
 
     // 👇 create VPC in which we'll launch the Instance
-    const vpc = ec2.Vpc.fromLookup(this, "VPC", {
-      isDefault: true,
+    const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
+      cidr: '10.0.0.0/16',
+      natGateways: 0,
+      subnetConfiguration: [
+        {name: 'public', cidrMask: 24, subnetType: ec2.SubnetType.PUBLIC},
+      ],
     });
-    // const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
-    //   cidr: '10.0.0.0/16',
-    //   natGateways: 0,
-    //   subnetConfiguration: [
-    //     {name: 'public', cidrMask: 24, subnetType: ec2.SubnetType.PUBLIC},
-    //   ],
-    // });
 
     // 👇 create Security Group for the Instance
     const webserverSG = new ec2.SecurityGroup(this, 'webserver-sg', {
