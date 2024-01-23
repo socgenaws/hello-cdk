@@ -1,71 +1,36 @@
+import * as autoscaling from 'aws-cdk-lib/aws-autoscaling';
+import * as ec2 from 'aws-cdk-lib/aws-ec2';
+import * as elbv2 from 'aws-cdk-lib/aws-elasticloadbalancingv2';
 import * as cdk from 'aws-cdk-lib';
-import { aws_s3 as s3 } from 'aws-cdk-lib';
-import { aws_ec2 as ec2 } from 'aws-cdk-lib';
-import { aws_iam as iam } from 'aws-cdk-lib';
-import { aws_elasticloadbalancing as elb } from 'aws-cdk-lib';
-import { aws_autoscaling as autoscaling } from 'aws-cdk-lib';
-import { Size as size } from 'aws-cdk-lib';
-import {readFileSync} from 'fs';
 
 
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    // new s3.Bucket(this, 'MyFirstBucketdchgdcghfcd1r610120241240', {
-    //   versioned: true
-    // });
+    const vpc = new ec2.Vpc(this, 'vpc', {natGateways: 1});
 
-    // 👇 create VPC in which we'll launch the Instance
-    const vpc = new ec2.Vpc(this, 'my-cdk-vpc', {
-      cidr: '10.0.0.0/16',
-      natGateways: 0,
-      subnetConfiguration: [
-        {name: 'public', cidrMask: 24, subnetType: ec2.SubnetType.PUBLIC},
-      ],
-    });
-
-    // 👇 create Security Group for the Instance
-    const webserverSG = new ec2.SecurityGroup(this, 'webserver-sg', {
+    const alb = new elbv2.ApplicationLoadBalancer(this, 'alb', {
       vpc,
-      allowAllOutbound: true,
+      internetFacing: true,
     });
 
-    webserverSG.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(22),
-      'allow SSH access from anywhere',
-    );
-
-    webserverSG.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(80),
-      'allow HTTP traffic from anywhere',
-    );
-
-    webserverSG.addIngressRule(
-      ec2.Peer.anyIpv4(),
-      ec2.Port.tcp(443),
-      'allow HTTPS traffic from anywhere',
-    );
-
-    // 👇 create a Role for the EC2 Instance
-    const webserverRole = new iam.Role(this, 'webserver-role', {
-      assumedBy: new iam.ServicePrincipal('ec2.amazonaws.com'),
-      managedPolicies: [
-        iam.ManagedPolicy.fromAwsManagedPolicyName('AmazonS3ReadOnlyAccess'),
-      ],
+    const listener = alb.addListener('Listener', {
+      port: 80,
+      open: true,
     });
 
-   
-   // 👇 create the EC2 Instance
-    const ec2Instance = new ec2.Instance(this, 'ec2-instance', {
+    const userData = ec2.UserData.forLinux();
+    userData.addCommands(
+      'sudo su',
+      'yum install -y httpd',
+      'systemctl start httpd',
+      'systemctl enable httpd',
+      'echo "<h1>Hello World from $(hostname -f)</h1>" > /var/www/html/index.html',
+    );
+
+    const asg = new autoscaling.AutoScalingGroup(this, 'asg', {
       vpc,
-      vpcSubnets: {
-        subnetType: ec2.SubnetType.PUBLIC
-      },
-      //role: webserverRole,
-      securityGroup: webserverSG,
       instanceType: ec2.InstanceType.of(
         ec2.InstanceClass.BURSTABLE2,
         ec2.InstanceSize.MICRO,
@@ -73,50 +38,41 @@ export class HelloCdkStack extends cdk.Stack {
       machineImage: new ec2.AmazonLinuxImage({
         generation: ec2.AmazonLinuxGeneration.AMAZON_LINUX_2,
       }),
-      keyName: 'virginia',
+      userData,
+      minCapacity: 2,
+      maxCapacity: 3,
     });
 
-    // 👇 load contents of script
-    //const userDataScript = readFileSync('./lib/user-data.sh', 'utf8');
-    // 👇 add the User Data script to the Instance
-   // ec2Instance.addUserData(userDataScript);
-
-     // 👇 create the EBS Volume 
-     const volume = new ec2.Volume(this, 'Volume', {
-      availabilityZone: 'us-east-1a',
-      size: size.gibibytes(1),
-      encrypted: true,
+    listener.addTargets('default-target', {
+      port: 80,
+      targets: [asg],
+      healthCheck: {
+        path: '/',
+        unhealthyThresholdCount: 2,
+        healthyThresholdCount: 5,
+        interval: cdk.Duration.seconds(30),
+      },
     });
 
+    listener.addAction('/static', {
+      priority: 5,
+      conditions: [elbv2.ListenerCondition.pathPatterns(['/static'])],
+      action: elbv2.ListenerAction.fixedResponse(200, {
+        contentType: 'text/html',
+        messageBody: '<h1>Static ALB Response</h1>',
+      }),
+    });
 
-    volume.grantAttachVolume(webserverRole, [ec2Instance]);
+    asg.scaleOnRequestCount('requests-per-minute', {
+      targetRequestsPerMinute: 60,
+    });
 
-    // ec2Instance.userData.addCommands(
-    //   'mkfs -t ext4 /dev/xvdf', // Format the volume
-    //   'mkdir /data', // Create a mount point
-    //   'mount /dev/xvdf /data', // Mount the volume
-    //   'echo "/dev/xvdf /data ext4 defaults 0 0" >> /etc/fstab' // Make the mount permanent
-    // );
+    asg.scaleOnCpuUtilization('cpu-util-scaling', {
+      targetUtilizationPercent: 75,
+    });
 
-    // const asg = new autoscaling.AutoScalingGroup(this, 'ASG', {
-    //   vpc,
-    //   instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE2, ec2.InstanceSize.MICRO),
-    //   machineImage: ec2.MachineImage.genericLinux({
-    //     'us-east-1': 'ami-06a8a766f09436b30',
-    //   }),
-    //   keyName: 'virginia',
-    //   minCapacity: 2
-    // });
-
-    // const lb = new elb.LoadBalancer(this, 'LB', {
-    //   vpc,
-    //   internetFacing: true,
-    //   healthCheck: {
-    //     port: 80
-    //   },
-    // });
-    // lb.addTarget(asg);
-    // const listener = lb.addListener({ externalPort: 80 });
-    // listener.connections.allowDefaultPortFromAnyIpv4('Open to the world');
+    new cdk.CfnOutput(this, 'albDNS', {
+      value: alb.loadBalancerDnsName,
+    });
   }
 }
