@@ -23,9 +23,9 @@ export class HelloCdkStack extends cdk.Stack {
         },
       })],
     });
-    
+    const vpc = new ec2.Vpc(this, 'VPC'),
     const fileSystem = new efs.FileSystem(this, 'MyEfsFileSystem', {
-      vpc: new ec2.Vpc(this, 'VPC'),
+      vpc,
       fileSystemPolicy: myFileSystemPolicy,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
@@ -33,7 +33,7 @@ export class HelloCdkStack extends cdk.Stack {
     fileSystem.addAccessPoint('AccessPoint');
 
     const instance = new ec2.Instance(this, 'ec2-instance', {
-      vpc: new ec2.Vpc(this, 'VPC'),
+      vpc,
       vpcSubnets: {
         subnetType: ec2.SubnetType.PUBLIC
       },
