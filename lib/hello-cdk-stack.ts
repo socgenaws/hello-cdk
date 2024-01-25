@@ -27,6 +27,7 @@ export class HelloCdkStack extends cdk.Stack {
     const fileSystem = new efs.FileSystem(this, 'MyEfsFileSystem', {
       vpc: new ec2.Vpc(this, 'VPC'),
       fileSystemPolicy: myFileSystemPolicy,
+      removalPolicy: cdk.RemovalPolicy.DESTROY,
     });
 
     fileSystem.addAccessPoint('AccessPoint');
