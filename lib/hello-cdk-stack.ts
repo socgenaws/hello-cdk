@@ -23,7 +23,8 @@ export class HelloCdkStack extends cdk.Stack {
         },
       })],
     });
-    const vpc = new ec2.Vpc(this, 'VPC'),
+    const vpc = new ec2.Vpc(this, 'VPC');
+    
     const fileSystem = new efs.FileSystem(this, 'MyEfsFileSystem', {
       vpc,
       fileSystemPolicy: myFileSystemPolicy,
