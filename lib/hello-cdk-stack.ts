@@ -1,41 +1,24 @@
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
+import * as s3Deployment from '@aws-cdk/aws-s3-deployment';
+
 
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const s3Bucket = new s3.Bucket(this, 's3-bucket', {
+    const myBucket = new s3.Bucket(this, 'MyTempFileBucket250120241250', {
       removalPolicy: cdk.RemovalPolicy.DESTROY,
       autoDeleteObjects: true,
-      // 👇 set up lifecycle rules
-      lifecycleRules: [
-        {
-          // 👇 optionally apply object name filtering
-          // prefix: 'data/',
-          abortIncompleteMultipartUploadAfter: cdk.Duration.days(90),
-          expiration: cdk.Duration.days(365),
-          transitions: [
-            {
-              storageClass: s3.StorageClass.INFREQUENT_ACCESS,
-              transitionAfter: cdk.Duration.days(30),
-            },
-            {
-              storageClass: s3.StorageClass.INTELLIGENT_TIERING,
-              transitionAfter: cdk.Duration.days(60),
-            },
-            {
-              storageClass: s3.StorageClass.GLACIER,
-              transitionAfter: cdk.Duration.days(90),
-            },
-            {
-              storageClass: s3.StorageClass.DEEP_ARCHIVE,
-              transitionAfter: cdk.Duration.days(180),
-            },
-          ],
-        },
-      ],
+      transferAcceleration: true,
     });
-    s3Bucket.transferAccelerationUrlForObject('abc.txt');
+    const deployment = new s3Deployment.BucketDeployment(
+      this,
+      'deployStaticWebsite',
+      {
+        sources: [s3Deployment.Source.asset('../website')],
+        destinationBucket: myBucket,
+      }
+    );
   }
 }
