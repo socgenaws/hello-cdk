@@ -1,7 +1,7 @@
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
-import * as s3Deployment from '@aws-cdk/aws-s3-deployment';
-
+import * as path from 'path';
+import {BucketDeployment, Source} from "aws-cdk-lib/aws-s3-deployment"
 
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
@@ -12,13 +12,12 @@ export class HelloCdkStack extends cdk.Stack {
       autoDeleteObjects: true,
       transferAcceleration: true,
     });
-    const deployment = new s3Deployment.BucketDeployment(
-      this,
-      'deployStaticWebsite',
-      {
-        sources: [s3Deployment.Source.asset('../website')],
-        destinationBucket: myBucket,
-      }
-    );
+    new BucketDeployment(this, "WebsiteDeployment", {
+      sources: [Source.asset(path.join(__dirname, '../website'))], // relative to the Stack dir
+      destinationBucket: myBucket
+  })
   }
 }
+
+
+
