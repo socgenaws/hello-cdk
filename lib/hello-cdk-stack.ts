@@ -13,7 +13,7 @@ export class HelloCdkStack extends cdk.Stack {
       transferAcceleration: true,
     });
     new BucketDeployment(this, "WebsiteDeployment", {
-      sources: [Source.asset(path.join(__dirname, '../website'))], // relative to the Stack dir
+      sources: [Source.asset('../website')], // relative to the Stack dir
       destinationBucket: myBucket
   })
   }
