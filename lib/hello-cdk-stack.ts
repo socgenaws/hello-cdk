@@ -4,7 +4,7 @@ import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
 import { RemovalPolicy} from 'aws-cdk-lib';
 import * as path from 'path';
-import * as iam from 'aws-cdk/aws-iam';
+import * as iam from 'aws-cdk-lib/aws-iam';
 
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
