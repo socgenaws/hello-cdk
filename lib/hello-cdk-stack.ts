@@ -11,7 +11,7 @@ export class HelloCdkStack extends cdk.Stack {
 
     // Content bucket
     const siteBucket = new s3.Bucket(this, 'SiteBucket', {
-      bucketName: 'MyTempFileBucketdddd250120241250',
+      bucketName: 'mytempfilebucketdddd250120241250',
       publicReadAccess: false,
       blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
       removalPolicy: RemovalPolicy.DESTROY, // NOT recommended for production code
