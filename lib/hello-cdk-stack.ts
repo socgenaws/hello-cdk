@@ -1,36 +1,27 @@
 // import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
-import {BucketDeployment, Source} from "@aws-cdk/aws-s3-deployment";
-import {Bucket, BucketAccessControl} from "@aws-cdk/aws-s3";
-import * as path from "path";
-
+import * as s3 from 'aws-cdk-lib/aws-s3';
+import * as s3deploy from 'aws-cdk-lib/aws-s3-deployment';
+import { RemovalPolicy} from 'aws-cdk-lib';
 
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const bucket = new Bucket(this, 'MyTempFileBucketdddd250120241250', {
-      accessControl: BucketAccessControl.PRIVATE,
-    })
+    // Content bucket
+    const siteBucket = new s3.Bucket(this, 'SiteBucket', {
+      bucketName: 'MyTempFileBucketdddd250120241250',
+      publicReadAccess: false,
+      blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
+      removalPolicy: RemovalPolicy.DESTROY, // NOT recommended for production code
+      autoDeleteObjects: true, // NOT recommended for production code
+    });
 
-    new BucketDeployment(this, 'BucketDeployment', {
-      destinationBucket: bucket,
-      sources: [Source.asset(path.resolve(__dirname, '../website'))]
-    })
-
-    // const myBucket = new s3.Bucket(this, 'MyTempFileBucketdddd250120241250', {
-    //   removalPolicy: cdk.RemovalPolicy.DESTROY,
-    //   autoDeleteObjects: true,
-    //   transferAcceleration: true,
-    // });    
-    // const deployment = new s3Deployment.BucketDeployment(
-    //   this,
-    //   'deployStaticWebsite',
-    //   {
-    //     sources: [s3Deployment.Source.asset('../website')],
-    //     destinationBucket: myBucket,
-    //   }
-    // );
+    // Deploy site contents to S3 bucket
+    new s3deploy.BucketDeployment(this, 'DeployWithInvalidation', {
+      sources: [s3deploy.Source.asset(path.join(__dirname, '../website'))],
+      destinationBucket: siteBucket,
+    });
   }
 }
 
