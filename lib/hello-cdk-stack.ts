@@ -1,6 +1,6 @@
 import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
-import * as s3Deployment from 'aws-cdk/aws-s3-deployment';
+import * as s3Deployment from '@aws-cdk/aws-s3-deployment';
 
 
 export class HelloCdkStack extends cdk.Stack {
