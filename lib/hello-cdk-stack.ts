@@ -1,40 +1,22 @@
 // import * as s3 from 'aws-cdk-lib/aws-s3';
 import * as cdk from 'aws-cdk-lib';
-import { CodePipeline, CodePipelineSource, ShellStep } from 'aws-cdk-lib/pipelines';
-import { CdkEBStage } from './eb-stage';
+import ecs = require('aws-cdk-lib/aws-ecs');
+import ec2 = require('aws-cdk-lib/aws-ec2');
+
 export class HelloCdkStack extends cdk.Stack {
   constructor(scope: cdk.App, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const pipeline = new CodePipeline(this, 'Pipeline', {
-      // The pipeline name
-      pipelineName: 'MyServicePipeline',
-
-       // How it will be built and synthesized
-       synth: new ShellStep('Synth', {
-         // Where the source can be found
-         input: CodePipelineSource.gitHub('OWNER/REPO', 'main'),
-         
-         // Install dependencies, build and run cdk synth
-         installCommands: ['npm i -g npm@latest'],
-         commands: [
-           'npm ci',
-           'npm run build',
-           'npx cdk synth'
-         ],
-       }),
+    // Create a VPC
+    const vpc = new ec2.Vpc(this, 'MyVpc', {
+      maxAzs: 2, // Use 2 availability zones for high availability
     });
 
-    // This is where we add the application stages
-    // For environment with default values 
-    // const deploy = new CdkEBStage(this, 'Pre-Prod');
+    const cluster = new ecs.Cluster(this, 'Ec2Cluster', { vpc });
+    cluster.addCapacity('DefaultAutoScalingGroup', {
+      instanceType: ec2.InstanceType.of(ec2.InstanceClass.BURSTABLE3, ec2.InstanceSize.MICRO)
+    });
 
-    // For environment with custom AutoScaling group configuration
-    const deploy = new CdkEBStage(this, 'Pre-Prod', { 
-      minSize : "1",
-      maxSize : "1"
-  });
-    const deployStage = pipeline.addStage(deploy); 
   }
 }
 
